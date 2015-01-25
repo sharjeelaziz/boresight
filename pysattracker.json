@@ -1,0 +1,12 @@
+{
+    "tle_url": "http://www.amsat.org/amsat/ftp/keps/current/nasabare.txt",
+    "sats": [
+        "ISS",
+        "AO-07"
+    ],
+    "home": {
+        "lat": "38.881146",
+        "lng": "-77.223820",
+        "alt": "59.2"
+    }
+}
