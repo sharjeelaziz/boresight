@@ -141,10 +141,7 @@ class LSM303DLHC:
 
         heading_deg = heading_rad*180/math.pi
 
-        degrees = math.floor(heading_deg)
-        minutes = round(((heading_deg - degrees) * 60))
-
-        return (int(degrees), int(minutes))
+        return heading_deg
 
 if __name__ == '__main__':
 
@@ -154,8 +151,7 @@ if __name__ == '__main__':
     lsm.set_declination(10, 40)
 
     while True:
-        (degrees, minutes) = lsm.get_heading()
+        degrees = lsm.get_heading()
         print degrees
-        print minutes
         sleep(1) # Output is fun to watch if this is commented out
 

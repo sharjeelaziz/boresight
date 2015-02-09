@@ -12,7 +12,7 @@ import signal
 from track import Track
 from nettle import NetTle
 from location import Location
-from lsm303dlhc import LSM303DLHC
+
 
 parser = argparse.ArgumentParser(description='Satellite Antenna Tracker')
 parser.add_argument('-c', '--config', dest='config', default='/etc/pysattracker.json', help='Config file')

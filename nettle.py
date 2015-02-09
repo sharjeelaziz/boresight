@@ -45,6 +45,14 @@ class NetTle:
             tles.append(element)
         return tles
 
+    def get_selected_tle(self, satellites, url):
+        elements = []
+        s = self.read_tle(url)
+        for element in s:
+            if (element[0] in satellites):
+                elements.append(element)
+        return elements
+
     def exit(self):
         self._running = False
         self._stop()
@@ -61,8 +69,7 @@ class NetTle:
         """
         while self._running:
             try:
-                # 'http://www.amsat.org/amsat/ftp/keps/current/nasabare.txt'
-                elements = self.get_tle(self.url, self.satellites[0])
+                elements = self.get_selected_tle(self.satellites, self.url)
                 self.log.info("Downloading elements.")
                 if (len(elements) > 0):
                     self.tle_handler(elements)

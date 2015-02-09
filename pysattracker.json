@@ -2,7 +2,24 @@
     "tle_url": "http://www.amsat.org/amsat/ftp/keps/current/nasabare.txt",
     "sats": [
         "ISS",
-        "AO-07"
+        "AO-07",
+        "FO-29",
+        "SO-33",
+        "RS-22",
+        "HO-68",
+        "AO-73",
+        "EO-79",
+        "UO-11",
+        "AO-16",
+        "LO-19",
+        "AO-27",
+        "IO-26",
+        "GO-32",
+        "NO-44",
+        "SO-50",
+        "CO-55",
+        "CO-57",
+        "AO-51"
     ],
     "home": {
         "lat": "38.881146",
@@ -10,3 +27,4 @@
         "alt": "59.2"
     }
 }
+
