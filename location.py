@@ -9,9 +9,10 @@ from time import sleep
 
 class Location:
 
-    def __init__(self, location_handler, config):
+    def __init__(self, location_handler, time_handler, config):
         self.log = logging.getLogger('pysattracker')
         self.location_handler = location_handler
+        self.time_handler = time_handler
         self.config = config
         self.session = gps.gps("localhost", "2947")
         self.session.stream(gps.WATCH_ENABLE | gps.WATCH_NEWSTYLE)
@@ -26,10 +27,10 @@ class Location:
         self._stop()
 
     def _start(self):
-        print "Staring location module."
+        self.log.info("Staring location module.")
 
     def _stop(self):
-        print "Stopping location module."
+        self.log.info("Stopping location module.")
 
     def _location_worker(self):
         """
@@ -47,10 +48,29 @@ class Location:
                         self.log.info("Updating Location")
                     if hasattr(report, 'time'):
                         gps_time = report.time
+                        self.time_handler(gps_time)
 
                 sleep(5.0)
             except KeyError:
                     pass
             except StopIteration:
                     self.session = None
-                    print "GPSD has terminated"          # __str__ allows args to be printed directly
+                    self.log.error("GPSD has terminated")          # __str__ allows args to be printed directly
+
+if __name__ == '__main__':
+
+    def time_cb(gps_time):
+        print "time received %s" % (gps_time)
+
+    def location_cb(latitude, longitude, altitude):
+        print "location received. %s %s %s" % (latitude, longitude, altitude)
+
+    config = {}
+
+    location = Location(location_cb, time_cb, config)
+
+    while True:
+        sleep(1)
+
+
+

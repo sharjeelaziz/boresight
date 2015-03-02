@@ -71,9 +71,9 @@ class Track:
             if (first_element == True or rise_time.datetime() <= first_sat.rise_time.datetime()):
                 first_element = False
                 first_sat = Satellite(element_index, rise_time, rise_azimuth, max_alt_time, max_alt, set_time, set_azimuth, name)
-                print ("Found Satellite: %s Rise time: %s azimuth: %s" % (first_sat.name, first_sat.rise_time, first_sat.rise_azimuth))
+                self.log.info("Found Satellite: %s Rise time: %s azimuth: %s" % (first_sat.name, first_sat.rise_time, first_sat.rise_azimuth))
 
-            print ("Satellite: %s Rise time: %s azimuth: %s" % (name, rise_time, rise_azimuth))
+            self.log.info("Satellite: %s Rise time: %s azimuth: %s" % (name, rise_time, rise_azimuth))
         return first_sat
 
     def _track_worker(self):
@@ -90,7 +90,7 @@ class Track:
                 if (len(self.elements) > 0):
                     self.log.info('%s: Rise: %s, Azimuth: %s' % (satellite.name, satellite.rise_time, satellite.rise_azimuth))
                     if (satellite.rise_time is not None and datetime.utcnow() > satellite.rise_time.datetime() and datetime.utcnow() < satellite.set_time.datetime()):
-                        sleep_interval = 1.0
+                        sleep_interval = 0.1
                         element = self.elements[satellite.element_index]
                         if (len(element) == 3):
                             sat = ephem.readtle(element[0], element[1], element[2])
@@ -111,6 +111,9 @@ class Track:
                         if (time.time() > get_sat_next):
                             get_sat_next = time.time() + get_sat_interval
                             satellite = self.get_visible_satellite()
+                            azimuth = satellite.rise_azimuth * self.degrees_per_radian
+                            self.servo.set_azimuth(azimuth)
+                            self.servo.set_elevation(0)
 
             except Exception as inst:
                 print type(inst)    # the exception instance

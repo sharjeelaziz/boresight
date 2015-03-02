@@ -57,6 +57,8 @@ def location_cb(latitude, longitude, altitude):
     st.set_location(latitude, longitude, altitude)
     logger.info("location received. %s %s %s", latitude, longitude, altitude)
 
+def time_cb(gps_time):
+    logger.info("time received. %s", gps_time)
 
 def start_tracker():
     # homeargs = {
@@ -72,7 +74,7 @@ logger.info("Starting pysattracker")
 
 st = Track(config)
 tles = NetTle(tle_cb, config)
-location = Location(location_cb, config)
+location = Location(location_cb, time_cb, config)
 
 
 def signal_handler(signal, frame):

@@ -58,10 +58,10 @@ class NetTle:
         self._stop()
 
     def _start(self):
-        print "Staring TLE Module."
+        self.log.info("Staring TLE Module.")
 
     def _stop(self):
-        print "Stopping TLE Module."
+        self.log.info("Stopping TLE Module.")
 
     def _tle_worker(self):
         """
