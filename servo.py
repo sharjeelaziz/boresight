@@ -16,18 +16,20 @@ class Servo:
 
         self.lsm = lsm
 
+        self.high_accuracy = False
         self.pan_channel = 0
         self.tilt_channel = 1
 
         self.target_degrees = 90
         self.elevation = 90
 
-        self.pan_servo_max = 562
-        self.pan_servo_min = 255
-        self.pan_servo_deg = self.lsm.get_heading()
+        self.pan_servo_max = 565
+        self.pan_servo_min = 262
 
-        self.tilt_servo_max = 410 # 0 degrees
-        self.tilt_servo_min = 338 # 90 degrees
+        self.tilt_servo_max = 415 # 0 degrees
+        self.tilt_servo_min = 343 # 90 degrees
+
+        self.tracking = False
 
         self.log = logging.getLogger('pysattracker')
         self._running = True
@@ -37,6 +39,16 @@ class Servo:
 
     def exit(self):
         self._running = False
+
+    def park_servos(self):
+        self.move_pan_servo(self.pan_servo_min)
+        self.move_tilt_servo(self.tilt_servo_max)
+
+    def pause_tracking(self):
+        self.tracking = False
+
+    def resume_tracking(self):
+        self.tracking = True
 
     def set_azimuth(self, degrees):
         if (degrees >= 0 and degrees <= 359):
@@ -54,9 +66,8 @@ class Servo:
             self.log.error("Invalid elevation value received.")
         self.log.info("Elevation updated.")
 
-    def calibrate(self):
-        self.move_pan_servo(self.pan_servo_min)
-        self.pan_servo_deg = self.lsm.get_heading()
+    def set_high_accuracy(self, accuracy):
+        self.high_accuracy = accuracy
 
     def get_pan_direction(self):
         current_degrees = self.lsm.get_heading()
@@ -86,8 +97,10 @@ class Servo:
         return pulse
 
     def get_tilt(self):
-        tilt = self.tilt_servo_max - abs(int(self.elevation * (float(self.tilt_servo_max - self.tilt_servo_min) / 90)))
-
+        if (self.elevation <= 0):
+            tilt = self.tilt_servo_max
+        else:
+            tilt = self.tilt_servo_max - abs(int(self.elevation * (float(self.tilt_servo_max - self.tilt_servo_min) / 90)))
         return tilt
 
     def get_pan_servo_cur(self):
@@ -119,6 +132,19 @@ class Servo:
                     self.pwm.set_pwm(self.pan_channel, 0, x)
         return
 
+    def fine_tune_pan(self):
+        servo_cur = self.get_pan_servo_cur()
+        current_degrees = self.lsm.get_heading()
+        if (current_degrees > self.target_degrees):
+            pulse = servo_cur + 1
+            self.pwm.set_pwm(self.pan_channel, 0, pulse)
+        elif (current_degrees < self.target_degrees):
+            pulse = servo_cur - 1
+            self.pwm.set_pwm(self.pan_channel, 0, pulse)
+
+        return
+
+
     def move_tilt_servo(self, pulse_length):
         servo_cur = self.get_tilt_servo_cur()
         if (pulse_length >= self.tilt_servo_min and pulse_length <= self.tilt_servo_max):
@@ -136,19 +162,18 @@ class Servo:
         """
         Runs as a thread
         """
-        sleep(3.0)
-        self.calibrate()
-
         while self._running:
             try:
+                if (self.tracking):
+                    direction = self.get_pan_direction()
+                    self.move_pan_servo(direction)
+                    if (self.high_accuracy):
+                        self.fine_tune_pan()
 
-                direction = self.get_pan_direction()
-                self.move_pan_servo(direction)
+                    tilt = self.get_tilt()
+                    self.move_tilt_servo(tilt)
 
-                tilt = self.get_tilt()
-                self.move_tilt_servo(tilt)
-
-                self.log.info("Direction: %d Current: %d Heading: %d Target Heading: %d Tilt: %d" % (direction,
+                    self.log.info("Direction: %d Current: %d Heading: %d Target Heading: %d Tilt: %d" % (direction,
                     self.pwm.get_pwm(self.pan_channel), self.lsm.get_heading(), self.target_degrees, tilt))
 
                 sleep(0.5)

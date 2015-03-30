@@ -11,6 +11,7 @@ import copy
 from datetime import datetime
 from lsm303dlhc import LSM303DLHC
 from servo import Servo
+from power import Power
 
 class Satellite:
     def __init__(self, element_index=0, rise_time=None, rise_azimuth=None, max_alt_time=None, max_alt=None, set_time=None, set_azimuth=None, name=None):
@@ -25,6 +26,9 @@ class Satellite:
 
 class Track:
     def __init__(self, config):
+        self.servo_power = Power(config)
+        self.servo_power.set_relay_two_off()
+
         self.degrees_per_radian = 180.0 / math.pi
         self.home = ephem.Observer()
         self.home.lon = config['home']['lng']
@@ -46,6 +50,7 @@ class Track:
     def exit(self):
         self._running = False
         self.servo.exit()
+        self.servo_power.cleanup()
 
     def set_elements(self, new_elements):
         self.elements = new_elements
@@ -85,12 +90,21 @@ class Track:
         get_sat_next = time.time()
         satellite = Satellite()
 
+        self.servo.pause_tracking()
+        self.servo_power.set_relay_two_on()
+        self.servo.park_servos()
+        self.servo_power.set_relay_two_off()
+
         while self._running:
             try:
                 if (len(self.elements) > 0):
                     self.log.info('%s: Rise: %s, Azimuth: %s' % (satellite.name, satellite.rise_time, satellite.rise_azimuth))
                     if (satellite.rise_time is not None and datetime.utcnow() > satellite.rise_time.datetime() and datetime.utcnow() < satellite.set_time.datetime()):
-                        sleep_interval = 0.1
+
+                        sleep_interval = 0.5
+                        self.servo.resume_tracking()
+                        self.servo_power.set_relay_two_on()
+
                         element = self.elements[satellite.element_index]
                         if (len(element) == 3):
                             sat = ephem.readtle(element[0], element[1], element[2])
@@ -103,17 +117,20 @@ class Track:
                             altitude = sat.alt * self.degrees_per_radian
                             azimuth = sat.az * self.degrees_per_radian
 
+                            self.servo.set_high_accuracy(False)
                             self.servo.set_azimuth(azimuth)
                             self.servo.set_elevation(altitude)
                             self.log.info('%s: altitude % 4.1f deg, azimuth % 5.1f deg' % (element[0], altitude, azimuth))
                     else:
                         sleep_interval = 5.0
+                        self.servo.pause_tracking()
+                        self.servo.park_servos()
+                        self.servo_power.set_relay_two_off()
                         if (time.time() > get_sat_next):
                             get_sat_next = time.time() + get_sat_interval
                             satellite = self.get_visible_satellite()
                             azimuth = satellite.rise_azimuth * self.degrees_per_radian
-                            self.servo.set_azimuth(azimuth)
-                            self.servo.set_elevation(0)
+                            self.servo.set_high_accuracy(False)
 
             except Exception as inst:
                 print type(inst)    # the exception instance
