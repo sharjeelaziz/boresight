@@ -153,5 +153,4 @@ if __name__ == '__main__':
     while True:
         degrees = lsm.get_heading()
         print degrees
-        sleep(1) 
-
+        sleep(1)

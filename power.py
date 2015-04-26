@@ -69,4 +69,3 @@ if __name__ == '__main__':
     pwr.set_relay_four_on()
     pwr.set_relay_four_off()
     pwr.cleanup()
-

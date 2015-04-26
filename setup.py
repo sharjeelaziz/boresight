@@ -20,9 +20,9 @@ class post_install(install):
             # cleanup old egg-info files
             try:
                 while True:
-                    p = pkg_resources.get_distribution("pysattracker")
+                    p = pkg_resources.get_distribution("boresight")
                     for f in os.listdir(p.location):
-                        if f.startswith("pysattracker") and f.endswith(".egg-info"):
+                        if f.startswith("boresight") and f.endswith(".egg-info"):
                             egg_info = os.path.join(p.location, f)
                             try:
                                 print "Deleting old egg-info: %s" % egg_info
@@ -36,9 +36,9 @@ class post_install(install):
         # install config file
         print ""
         cd = os.path.dirname(os.path.realpath(__file__))
-        src = os.path.join(cd, "pysattracker.json")
-        dest = os.path.join(root, "etc/pysattracker.json")
-        dest_new = os.path.join(root, "etc/pysattracler.json.new")
+        src = os.path.join(cd, "boresight.json")
+        dest = os.path.join(root, "etc/boresight.json")
+        dest_new = os.path.join(root, "etc/boresight.json.new")
         mkpath(os.path.dirname(dest))
         if os.path.isfile(dest):
             print "Warning: %s already exists. Saved new config file to %s" % (dest, dest_new)
@@ -48,7 +48,7 @@ class post_install(install):
             shutil.copyfile(src, dest)
 
 setup(
-    name='pysattracker',
+    name='boresight',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -59,7 +59,7 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/sharjeelaziz/pysattracker',
+    url='https://github.com/sharjeelaziz/boresight',
 
     # Author details
     author='Sharjeel Aziz (shaji)',
@@ -93,7 +93,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=['pysattracker'],
+    packages=['boresight'],
 
     # List run-time dependencies here.  These will be installed by pip when your
     # project is installed. For an analysis of "install_requires" vs pip's

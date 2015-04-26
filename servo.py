@@ -31,7 +31,7 @@ class Servo:
 
         self.tracking = False
 
-        self.log = logging.getLogger('pysattracker')
+        self.log = logging.getLogger('boresight')
         self._running = True
         self._worker = threading.Thread(target=self._servo_worker)
         self._worker.setDaemon(True)

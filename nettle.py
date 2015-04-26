@@ -10,7 +10,7 @@ from time import sleep
 class NetTle:
 
     def __init__(self, tle_handler, config):
-        self.log = logging.getLogger('pysattracker')
+        self.log = logging.getLogger('boresight')
         self.tle_handler = tle_handler
         self.config = config
         self.satellites = self.config['sats']

@@ -41,7 +41,7 @@ class Track:
         self.lsm.set_declination(10, 40)
         self.servo = Servo(config, self.lsm)
 
-        self.log = logging.getLogger('pysattracker')
+        self.log = logging.getLogger('boresight')
         self._running = True
         self._worker = threading.Thread(target=self._track_worker)
         self._worker.setDaemon(True)

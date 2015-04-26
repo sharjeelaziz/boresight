@@ -10,7 +10,7 @@ from time import sleep
 class Location:
 
     def __init__(self, location_handler, time_handler, config):
-        self.log = logging.getLogger('pysattracker')
+        self.log = logging.getLogger('boresight')
         self.location_handler = location_handler
         self.time_handler = time_handler
         self.config = config
@@ -71,6 +71,3 @@ if __name__ == '__main__':
 
     while True:
         sleep(1)
-
-
-
