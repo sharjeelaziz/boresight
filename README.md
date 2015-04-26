@@ -1,2 +1,2 @@
-# pysattracker
+# boresight
 Satellite Antenna Tracker

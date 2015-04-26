@@ -23,8 +23,8 @@ class Servo:
         self.target_degrees = 90
         self.elevation = 90
 
-        self.pan_servo_max = 565
-        self.pan_servo_min = 262
+        self.pan_servo_max = 568
+        self.pan_servo_min = 258
 
         self.tilt_servo_max = 415 # 0 degrees
         self.tilt_servo_min = 343 # 90 degrees
@@ -190,13 +190,18 @@ if __name__ == '__main__':
 
     from time import sleep
     from lsm303dlhc import LSM303DLHC
+    from power import Power
 
     config = {}
 
     lsm = LSM303DLHC()
     lsm.set_declination(10, 40)
 
+    servo_power = Power(config)
+    servo_power.set_relay_two_on()
+
     servo = Servo(config, lsm)
+    servo.resume_tracking()
     servo.set_azimuth(340)
     servo.set_elevation(0)
 

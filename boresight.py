@@ -15,12 +15,12 @@ from location import Location
 
 
 parser = argparse.ArgumentParser(description='Satellite Antenna Tracker')
-parser.add_argument('-c', '--config', dest='config', default='/etc/pysattracker.json', help='Config file')
+parser.add_argument('-c', '--config', dest='config', default='/etc/boresight.json', help='Config file')
 parser.add_argument('-s', '--syslog', action='store_true', help='Syslog logging')
 parser.add_argument('-v', '--verbose', action='store_true', help='Log all')
 args = parser.parse_args()
 
-logger = logging.getLogger('pysattracker')
+logger = logging.getLogger('boresight')
 loglevel = logging.DEBUG
 
 if args.verbose:
@@ -32,7 +32,7 @@ logger.setLevel(loglevel)
 
 if args.syslog:
     loghandler = logging.handlers.SysLogHandler(address='/dev/log')
-    formater = logging.Formatter('pysattracker: %(message)s')
+    formater = logging.Formatter('boresight: %(message)s')
     loghandler.setFormatter(formater)
 else:
     loghandler = logging.StreamHandler(sys.stdout)
@@ -70,7 +70,7 @@ def start_tracker():
         sleep(5)
 
 
-logger.info("Starting pysattracker")
+logger.info("Starting boresight")
 
 st = Track(config)
 tles = NetTle(tle_cb, config)
@@ -78,7 +78,7 @@ location = Location(location_cb, time_cb, config)
 
 
 def signal_handler(signal, frame):
-    logger.info("Stopping pysattracker")
+    logger.info("Stopping boresight")
     st.exit()
     tles.exit()
     location.exit()
