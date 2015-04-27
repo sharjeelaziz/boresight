@@ -5,7 +5,7 @@ python:
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
   - "if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]] ;then pip install unittest2 ;fi"
-  - "if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]] ;then pip install ephem ;fi"
+  - "pip install ephem"
 # command to run tests, e.g. python setup.py test
 script:
   - "if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]] ;then unit2 discover tests ;else python -m unittest discover tests; fi"
